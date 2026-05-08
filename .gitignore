@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+.DS_Store
+service-account-key.json
+dist/
+build/
+uploads/*.csv
