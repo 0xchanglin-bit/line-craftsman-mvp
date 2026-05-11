@@ -1,33 +1,38 @@
-import liff from '@line/liff';
+// Uses window.liff loaded via CDN script tag in index.html
 
 let initialized = false;
 
+function getLiff() {
+  if (!window.liff) throw new Error('LIFF SDK not loaded');
+  return window.liff;
+}
+
 export async function initLiff(liffId) {
   if (initialized) return;
-  await liff.init({ liffId });
+  await getLiff().init({ liffId });
   initialized = true;
 }
 
 export function isInLiff() {
-  return liff.isInClient();
+  return getLiff().isInClient();
 }
 
 export function isLoggedIn() {
-  return liff.isLoggedIn();
+  return getLiff().isLoggedIn();
 }
 
 export function loginWithLiff() {
-  liff.login();
+  getLiff().login();
 }
 
 export function getIdToken() {
-  return liff.getIDToken();
+  return getLiff().getIDToken();
 }
 
 export async function getUserProfile() {
-  return await liff.getProfile();
+  return await getLiff().getProfile();
 }
 
 export function closeLiff() {
-  if (isInLiff()) liff.closeWindow();
+  if (isInLiff()) getLiff().closeWindow();
 }
