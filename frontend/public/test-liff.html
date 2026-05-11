@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIFF 測試</title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .log {
+      background: #f5f5f5;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .error { background: #ffebee; color: #c62828; }
+    .success { background: #e8f5e9; color: #2e7d32; }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 4px;
+      background: #06C755;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 LIFF 測試頁面</h1>
+
+  <div id="logs"></div>
+
+  <button onclick="testLiff()">開始測試</button>
+  <button onclick="clearLogs()">清除日誌</button>
+
+  <script>
+    const LIFF_ID = '2009923445-JWS4STvM';
+
+    function log(message, type = 'log') {
+      const logsDiv = document.getElementById('logs');
+      const logEntry = document.createElement('div');
+      logEntry.className = `log ${type}`;
+      logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logsDiv.appendChild(logEntry);
+      console.log(message);
+    }
+
+    function clearLogs() {
+      document.getElementById('logs').innerHTML = '';
+    }
+
+    async function testLiff() {
+      clearLogs();
+
+      try {
+        // 1. 檢查 LIFF SDK
+        log('Step 1: 檢查 LIFF SDK 是否載入');
+        if (!window.liff) {
+          log('❌ LIFF SDK 未載入', 'error');
+          return;
+        }
+        log('✅ LIFF SDK 已載入', 'success');
+
+        // 2. 初始化 LIFF
+        log(`Step 2: 初始化 LIFF (ID: ${LIFF_ID})`);
+        await window.liff.init({
+          liffId: LIFF_ID,
+          withLoginOnIssuedAccessToken: true
+        });
+        log('✅ LIFF 初始化成功', 'success');
+
+        // 3. 檢查環境
+        log('Step 3: 檢查運行環境');
+        const isInClient = window.liff.isInClient();
+        log(`在 LINE 中: ${isInClient ? '是' : '否'}`);
+
+        // 4. 檢查登入狀態
+        log('Step 4: 檢查登入狀態');
+        const isLoggedIn = window.liff.isLoggedIn();
+        log(`登入狀態: ${isLoggedIn ? '已登入' : '未登入'}`);
+
+        if (!isLoggedIn) {
+          log('Step 5: 執行登入', 'error');
+          window.liff.login();
+          return;
+        }
+
+        // 5. 獲取用戶資料
+        log('Step 5: 獲取用戶資料');
+        const profile = await window.liff.getProfile();
+        log(`✅ 用戶名稱: ${profile.displayName}`, 'success');
+        log(`✅ 用戶 ID: ${profile.userId}`, 'success');
+
+        // 6. 獲取 ID Token
+        log('Step 6: 獲取 ID Token');
+        const idToken = window.liff.getIDToken();
+        if (idToken) {
+          log(`✅ ID Token: ${idToken.substring(0, 50)}...`, 'success');
+        } else {
+          log('❌ 無法獲取 ID Token', 'error');
+        }
+
+        log('========== 測試完成 ==========', 'success');
+
+      } catch (error) {
+        log(`❌ 錯誤: ${error.message}`, 'error');
+        log(`錯誤類型: ${error.name}`, 'error');
+        log(`完整錯誤: ${JSON.stringify(error, null, 2)}`, 'error');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      log('頁面已載入，點擊「開始測試」按鈕');
+    });
+  </script>
+</body>
+</html>
