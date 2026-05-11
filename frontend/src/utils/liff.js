@@ -9,7 +9,7 @@ function getLiff() {
 
 export async function initLiff(liffId) {
   if (initialized) return;
-  await getLiff().init({ liffId });
+  await getLiff().init({ liffId, withLoginOnIssuedAccessToken: true });
   initialized = true;
 }
 
